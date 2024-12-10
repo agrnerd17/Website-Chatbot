@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Box, TextField, Typography, IconButton, Stack, Paper } from "@mui/material";
+import { Box, TextField, Button, Typography, IconButton, Stack, Paper } from "@mui/material";
 import { IoSend } from "react-icons/io5";
 import { getChatbotResponse } from "../api/cohereAPI.js"; // Adjust import if needed
 

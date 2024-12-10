@@ -49,7 +49,7 @@ export async function initializeEmbeddings() {
       }
     );
     pastryEmbeddings = response.data.embeddings;
-    console.log("Pastry embeddings initialized successfully:", pastryEmbeddings);  // Debugging line
+    console.log("Pastry embeddings initialized successfully.");
   } catch (error) {
     console.error("Error initializing embeddings:", error.message);
   }
@@ -60,48 +60,18 @@ export async function initializeEmbeddings() {
  * @param {string} userQuestion - User's input message
  * @returns {string|null} - Predefined answer if a match is found, otherwise null
  */
-async function getPredefinedAnswer(userQuestion) {
+function getPredefinedAnswer(userQuestion) {
   const threshold = 0.8; // Set a similarity threshold for matching
+  let bestMatch = { score: 0, answer: null };
 
-  try {
-    const queryResponse = await axios.post(
-      "https://api.cohere.ai/v1/embed",
-      { texts: [userQuestion], model: "embed-english-v2.0" },
-      {
-        headers: {
-          Authorization: `Bearer ${COHERE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    const queryEmbedding = queryResponse.data.embeddings[0];
-
-    let bestMatch = { score: 0, answer: null };
-
-    for (const { question, answer } of predefinedQuestions) {
-      const questionResponse = await axios.post(
-        "https://api.cohere.ai/v1/embed",
-        { texts: [question], model: "embed-english-v2.0" },
-        {
-          headers: {
-            Authorization: `Bearer ${COHERE_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      const questionEmbedding = questionResponse.data.embeddings[0];
-
-      const similarity = cosineSimilarity(queryEmbedding, questionEmbedding);
-      if (similarity > bestMatch.score && similarity >= threshold) {
-        bestMatch = { score: similarity, answer };
-      }
+  predefinedQuestions.forEach(({ question, answer }) => {
+    const similarity = cosineSimilarity(userQuestion.toLowerCase(), question.toLowerCase());
+    if (similarity > bestMatch.score && similarity >= threshold) {
+      bestMatch = { score: similarity, answer };
     }
+  });
 
-    return bestMatch.answer;
-  } catch (error) {
-    console.error("Error fetching embeddings:", error.message);
-    return null;
-  }
+  return bestMatch.answer;
 }
 
 /**
@@ -116,7 +86,7 @@ export async function getChatbotResponse(prompt) {
     }
 
     // Check for predefined answer
-    const predefinedAnswer = await getPredefinedAnswer(prompt);
+    const predefinedAnswer = getPredefinedAnswer(prompt);
     if (predefinedAnswer) return predefinedAnswer;
 
     // If no predefined match, use Cohere API

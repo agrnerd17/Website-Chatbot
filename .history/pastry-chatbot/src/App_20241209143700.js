@@ -14,28 +14,30 @@ function App() {
 
   return (
     <div className="App">
-      {/* Navbar */}
       <Navbar />
-
-      {/* Homepage as main content */}
       <main style={{ marginTop: "100px" }}>
-        <Homepage />
+      
       </main>
-
+      <main>
+        <div className="content text-center">
+        </div>
+      </main>
+      
       {/* Conditionally render the Chatbot */}
       {isChatbotOpen && <Chatbot />}
 
       {/* Pastrybot UI */}
       <div
-        style={{
-          position: "fixed",
-          bottom: "20px",
-          right: "20px",
-          zIndex: 1000,
-        }}
+      style={{
+        position: "fixed",
+        bottom: "20px",
+        right: "20px",
+        zIndex: 1000
+      }}
       >
         <PastryBot />
       </div>
+      <Homepage />
     </div>
   );
 }
