@@ -21,6 +21,8 @@ const Navbar = () => {
       {/* Right Action (e.g., Sign In or Cart) */}
       <div className="navbar-right">
         <button className="navbar-button">Sign In</button>
+        {/* Optional cart icon */}
+        {/* <i className="fas fa-shopping-cart"></i> */}
       </div>
     </nav>
   );
