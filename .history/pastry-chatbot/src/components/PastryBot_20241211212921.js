@@ -7,27 +7,26 @@ import {
   Typography,
   Avatar,
   Stack,
-  Container
+  Container,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { FiSend } from "react-icons/fi";
 import { GiCupcake } from "react-icons/gi";
-import { getChatbotResponse } from "../api/cohereAPI"; 
+import { getChatbotResponse } from "../api/cohereAPI";
 
 // Styled components for layout
 const ChatContainer = styled(Paper)(({ theme }) => ({
   position: "fixed",
-  bottom: "20px", 
-  right: "20px", 
-  width: "350px", 
-  maxWidth: "400px",
-  height: "450px", 
+  bottom: "20px",
+  right: "20px",
+  width: "350px",
+  height: "450px",
   borderRadius: "16px",
   display: "flex",
   flexDirection: "column",
   boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
   backgroundColor: "#fff",
-  zIndex: 999, 
+  zIndex: 999,
 }));
 
 const MessageContainer = styled(Box)({
@@ -37,7 +36,6 @@ const MessageContainer = styled(Box)({
   display: "flex",
   flexDirection: "column",
   gap: "12px",
-  maxHeight: "300px", 
 });
 
 const InputContainer = styled(Box)({
@@ -51,7 +49,7 @@ const InputContainer = styled(Box)({
 
 const Header = styled(Box)({
   padding: "16px",
-  backgroundColor: "#FF69B4", 
+  backgroundColor: "#FF69B4",
   color: "white",
   display: "flex",
   alignItems: "center",
@@ -61,8 +59,8 @@ const Header = styled(Box)({
 const PredefinedQuestionsContainer = styled(Box)({
   padding: "8px",
   borderBottom: "1px solid rgba(0, 0, 0, 0.1)",
-  overflowY: "auto", 
-  maxHeight: "150px", 
+  overflowY: "auto",
+  maxHeight: "150px",
 });
 
 const PastryBot = () => {
@@ -71,7 +69,6 @@ const PastryBot = () => {
   const [chatOpen, setChatOpen] = useState(false);
   const messagesEndRef = useRef(null);
 
-  // Predefined questions
   const predefinedQuestions = [
     "What are your most popular pastries?",
     "Do you offer vegan options?",
@@ -104,19 +101,23 @@ const PastryBot = () => {
     try {
       const response = await getChatbotResponse(input);
       const botMessage = {
-        text: response,
+        text: response || "Sorry, I couldn't process that. Please try again.",
         sender: "bot",
         time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       };
       setMessages((prev) => [...prev, botMessage]);
     } catch (error) {
       console.error("Error with Cohere API:", error);
+      setMessages((prev) => [
+        ...prev,
+        { text: "Oops! Something went wrong. Please try again later.", sender: "bot" },
+      ]);
     }
   };
 
   const handleQuestionClick = (question) => {
     setInput(question);
-    handleSend({ preventDefault: () => {} }); 
+    handleSend({ preventDefault: () => {} });
   };
 
   const toggleChat = () => {
@@ -136,8 +137,6 @@ const PastryBot = () => {
               X
             </IconButton>
           </Header>
-
-          {/* Predefined Questions */}
           <PredefinedQuestionsContainer>
             {predefinedQuestions.map((question, index) => (
               <Typography
@@ -157,15 +156,12 @@ const PastryBot = () => {
               </Typography>
             ))}
           </PredefinedQuestionsContainer>
-
-          {/* Chat Messages */}
           <MessageContainer>
             {messages.map((message, index) => (
               <Stack
                 key={index}
                 direction="row"
                 justifyContent={message.sender === "user" ? "flex-end" : "flex-start"}
-                alignItems="center"
                 spacing={1}
               >
                 {message.sender === "bot" && (
@@ -186,7 +182,7 @@ const PastryBot = () => {
                   >
                     {message.text}
                   </Typography>
-                  <Typography variant="caption" color="textSecondary" sx={{ pl: 1 }}>
+                  <Typography variant="caption" sx={{ pl: 1 }}>
                     {message.time}
                   </Typography>
                 </Box>
@@ -194,12 +190,9 @@ const PastryBot = () => {
             ))}
             <div ref={messagesEndRef} />
           </MessageContainer>
-
-          {/* Input Field */}
           <InputContainer>
             <TextField
               fullWidth
-              variant="outlined"
               placeholder="Type your message..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -208,10 +201,13 @@ const PastryBot = () => {
             />
             <IconButton
               onClick={handleSend}
-              color="primary"
-              sx={{ backgroundColor: "#FF69B4", "&:hover": { backgroundColor: "#FF1493" } }}
+              sx={{
+                backgroundColor: "#FF69B4",
+                "&:hover": { backgroundColor: "#FF1493" },
+                color: "white",
+              }}
             >
-              <FiSend style={{ color: "white" }} />
+              <FiSend />
             </IconButton>
           </InputContainer>
         </ChatContainer>
@@ -226,7 +222,6 @@ const PastryBot = () => {
             color: "white",
             borderRadius: "50%",
             padding: "10px",
-            zIndex: 9999,
           }}
         >
           <GiCupcake size={24} />
